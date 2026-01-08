@@ -2,7 +2,10 @@
 import { useState, Suspense, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { MailOpen, MapPin, Heart, Volume2, VolumeX, Navigation, Calendar, Copy, Check, Gift } from 'lucide-react';
+import { 
+  MailOpen, MapPin, Heart, Volume2, VolumeX, Navigation, 
+  Copy, CheckCircle2, Calendar, MessageCircle, Gift, Users 
+} from 'lucide-react';
 
 function InvitationContent() {
   const searchParams = useSearchParams();
@@ -12,7 +15,7 @@ function InvitationContent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  // LOGIKA COUNTDOWN
+  // --- LOGIKA HITUNG MUNDUR ---
   const [timeLeft, setTimeLeft] = useState({ hari: 0, jam: 0, menit: 0, detik: 0 });
   useEffect(() => {
     const targetDate = new Date("2026-01-10T08:00:00").getTime();
@@ -30,12 +33,16 @@ function InvitationContent() {
     return () => clearInterval(interval);
   }, []);
 
-  const { scrollYProgress } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
+  const bgY = useTransform(scrollY, [0, 5000], [0, -400]); 
+  const bgScale = useTransform(scrollY, [0, 5000], [1.1, 1.3]);
 
   const openInvitation = () => {
     setIsOpen(true);
     setIsPlaying(true);
-    if (audioRef.current) audioRef.current.play();
+    if (audioRef.current) { 
+      audioRef.current.play().catch((err) => console.log("Audio play blocked", err)); 
+    }
   };
 
   const copyToClipboard = (text: string, id: string) => {
@@ -44,158 +51,237 @@ function InvitationContent() {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const CornerOrnaments = () => (
+    <>
+      <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-[#BF953F]/40 rounded-tl-[40px] pointer-events-none z-10" />
+      <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-[#BF953F]/40 rounded-br-[40px] pointer-events-none z-10" />
+    </>
+  );
+
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <main className="min-h-screen relative overflow-x-hidden font-sans bg-black">
       <audio ref={audioRef} loop src="/wedding.mp3" />
 
-      {/* 1. COVER / LANDING PAGE */}
-      <AnimatePresence>
+      {/* --- BACKGROUND UTAMA --- */}
+      <div className="fixed inset-0 -z-20">
+        <motion.div style={{ y: bgY, scale: bgScale } as any} className="w-full h-full">
+            <img src="/bg-wedding.jpg" className="w-full h-full object-cover opacity-60" alt="Background" />
+        </motion.div>
+      </div>
+
+      {/* --- LANDING PAGE (COVER) --- */}
+      <AnimatePresence mode="wait">
         {!isOpen && (
           <motion.section
-            exit={{ opacity: 0, y: -100 } as any}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-cover bg-center"
-            style={{ backgroundImage: 'url("/bg-wedding.jpg")' }}
+            key="cover"
+            exit={{ opacity: 0, y: -100, transition: { duration: 1 } } as any}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
           >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <div className="relative z-10 text-center px-6">
-              <motion.p initial={{ opacity: 0 } as any} animate={{ opacity: 1 } as any} className="gold-text tracking-[0.3em] text-xs mb-4">THE WEDDING OF</motion.p>
-              <h1 className="text-5xl md:text-7xl font-serif gold-text mb-8">Novi & Rijal</h1>
-              <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20">
-                <p className="text-gray-300 text-sm mb-2">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <h2 className="text-2xl font-serif mb-6">{guestName}</h2>
-                <button onClick={openInvitation} className="bg-[#BF953F] text-black px-8 py-3 rounded-full font-bold flex items-center gap-2 mx-auto hover:scale-105 transition-transform">
-                  <MailOpen size={18} /> Buka Undangan
+            <div className="relative z-10 text-center px-4 max-w-2xl">
+              <motion.p initial={{ opacity: 0, y: 20 } as any} animate={{ opacity: 1, y: 0 } as any} className="text-[#D4C3B3] tracking-[0.4em] uppercase text-[10px] mb-6 font-bold">
+                Undangan Pernikahan
+              </motion.p>
+              <motion.h1 initial={{ opacity: 0, y: 20 } as any} animate={{ opacity: 1, y: 0 } as any} transition={{ delay: 0.2 }} className="text-5xl md:text-8xl gold-text font-serif mb-12">
+                Novi Salsabilah & Rijal Fauji
+              </motion.h1>
+              
+              <motion.div initial={{ opacity: 0, scale: 0.9 } as any} animate={{ opacity: 1, scale: 1 } as any} transition={{ delay: 0.4 }} className="bg-black/40 backdrop-blur-xl p-10 rounded-[50px] border border-white/10 shadow-2xl relative">
+                <CornerOrnaments />
+                <p className="text-gray-400 text-xs mb-4 italic uppercase tracking-widest">Special Guest:</p>
+                <motion.h2 className="text-3xl text-white font-serif mb-8 border-b border-[#BF953F]/30 pb-4 inline-block">
+                  {guestName}
+                </motion.h2>
+                <button onClick={openInvitation} className="w-full bg-gradient-to-r from-[#BF953F] to-[#AA771C] text-black py-4 rounded-full flex items-center justify-center gap-3 font-bold uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-transform">
+                  <MailOpen size={16} /> Buka Undangan
                 </button>
-              </div>
+              </motion.div>
             </div>
           </motion.section>
         )}
       </AnimatePresence>
 
-      {/* 2. KONTEN UTAMA */}
+      {/* --- ISI UNDANGAN UTAMA --- */}
       {isOpen && (
-        <div className="relative">
-          {/* Musik Kontrol */}
+        <motion.div initial={{ opacity: 0 } as any} animate={{ opacity: 1 } as any} transition={{ duration: 1.5 }}>
+          
           <button onClick={() => { if(audioRef.current) isPlaying ? audioRef.current.pause() : audioRef.current.play(); setIsPlaying(!isPlaying); }} 
-            className="fixed bottom-6 right-6 z-50 p-3 bg-[#BF953F] rounded-full text-black shadow-xl">
-            {isPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            className="fixed bottom-6 right-6 z-50 p-4 bg-black/60 border border-[#BF953F] rounded-full text-[#BF953F] backdrop-blur-md shadow-2xl">
+            {isPlaying ? <Volume2 size={20} className="animate-pulse" /> : <VolumeX size={20} />}
           </button>
 
-          {/* Progress Bar */}
-          <motion.div className="fixed top-0 left-0 right-0 h-1 bg-[#BF953F] z-[100] origin-left" style={{ scaleX: scrollYProgress } as any} />
+          <motion.div className="fixed top-0 left-0 right-0 h-1 bg-[#BF953F] origin-left z-[200]" style={{ scaleX: scrollYProgress } as any} />
 
-          {/* HERO SECTION */}
-          <section className="h-screen flex items-center justify-center text-center px-6 bg-fixed bg-cover" style={{ backgroundImage: 'url("/bg-wedding.jpg")' }}>
-             <div className="absolute inset-0 bg-black/50" />
-             <div className="relative">
-                <motion.h2 initial={{ y: 50 } as any} whileInView={{ y: 0 } as any} className="text-6xl md:text-8xl font-serif gold-text">Novi & Rijal</motion.h2>
-                <p className="mt-4 tracking-[0.5em]">10 JANUARI 2026</p>
+          {/* SECTION 1: HERO */}
+          <section className="relative h-screen flex items-center justify-center px-4">
+             <div className="text-center">
+                <motion.span initial={{ opacity: 0 } as any} whileInView={{ opacity: 1 } as any} className="text-[#BF953F] tracking-[0.6em] uppercase text-[10px] font-black">The Wedding of</motion.span>
+                <h2 className="text-6xl md:text-8xl gold-text font-serif mt-6 mb-8 leading-tight">Novi & Rijal</h2>
+                <div className="flex justify-center gap-4">
+                   <div className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl w-20">
+                      <p className="text-2xl font-bold gold-text">{timeLeft.hari}</p>
+                      <p className="text-[8px] uppercase text-gray-400">Hari</p>
+                   </div>
+                   <div className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl w-20">
+                      <p className="text-2xl font-bold gold-text">{timeLeft.jam}</p>
+                      <p className="text-[8px] uppercase text-gray-400">Jam</p>
+                   </div>
+                   <div className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl w-20">
+                      <p className="text-2xl font-bold gold-text">{timeLeft.menit}</p>
+                      <p className="text-[8px] uppercase text-gray-400">Menit</p>
+                   </div>
+                   <div className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl w-20">
+                      <p className="text-2xl font-bold gold-text">{timeLeft.detik}</p>
+                      <p className="text-[8px] uppercase text-gray-400">Detik</p>
+                   </div>
+                </div>
              </div>
           </section>
 
-          {/* KATA SAMBUTAN (AR-RUM) */}
-          <section className="py-20 px-6 text-center max-w-4xl mx-auto">
-            <Heart className="mx-auto text-[#BF953F] mb-6" />
-            <h3 className="font-serif text-2xl mb-6 gold-text italic">Assalamu’alaikum Warahmatullahi Wabarakatuh</h3>
-            <p className="text-gray-300 leading-relaxed mb-8">
-              Maha suci Allah SWT yang telah menciptakan makhluk-Nya berpasang-pasangan. 
-              Ya Allah, perkenankanlah kami merangkaikan kasih sayang yang Kau ciptakan dalam ikatan pernikahan.
+          {/* SECTION 2: KATA SAMBUTAN (AR-RUM) */}
+          <section className="max-w-4xl mx-auto px-6 py-32 text-center">
+            <Heart className="mx-auto text-[#BF953F] mb-10 animate-pulse" size={40} />
+            <h3 className="text-2xl gold-text font-serif mb-8 italic uppercase tracking-widest">Assalamu’alaikum Wr. Wb.</h3>
+            <p className="text-gray-300 mb-12 leading-relaxed">
+              Maha suci Allah SWT yang telah menciptakan makhluk-Nya berpasang-pasangan. Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di hari bahagia kami.
             </p>
-            <div className="p-6 border-y border-[#BF953F]/30">
-              <p className="italic text-lg font-serif">
-                "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
-              </p>
-              <p className="mt-4 text-xs gold-text">(QS. AR-RUM: 21)</p>
+            <div className="p-10 bg-white/5 rounded-[40px] border border-white/10 italic font-serif text-xl md:text-2xl gold-text leading-loose">
+              "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
+              <br/><span className="text-xs mt-6 block text-gray-500 tracking-[0.3em]">— QS. AR-RUM: 21</span>
             </div>
           </section>
 
-          {/* PROFIL MEMPELAI */}
-          <section className="py-20 px-6 grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-             <div className="text-center">
-                <div className="w-48 h-48 mx-auto rounded-full border-4 border-[#BF953F] overflow-hidden mb-6">
-                   <img src="/mempelai-wanita.jpg" alt="Novi" className="w-full h-full object-cover" />
+          {/* SECTION 3: PROFIL MEMPELAI (SANGAT DETAIL) */}
+          <section className="max-w-6xl mx-auto px-6 py-24">
+            <div className="grid md:grid-cols-2 gap-20 items-center">
+              <motion.div initial={{ x: -50, opacity: 0 } as any} whileInView={{ x: 0, opacity: 1 } as any} className="text-center group">
+                <div className="w-64 h-64 mx-auto rounded-full border-4 border-[#BF953F] overflow-hidden mb-8 shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                   <img src="/mempelai.jpg" className="w-full h-full object-cover" alt="Novi" />
                 </div>
-                <h3 className="text-3xl font-serif gold-text">Novi Salsabilah</h3>
-                <p className="text-sm text-gray-400 mt-2">Putri dari Bapak Fulan & Ibu Fulanah</p>
-             </div>
-             <div className="text-center">
-                <div className="w-48 h-48 mx-auto rounded-full border-4 border-[#BF953F] overflow-hidden mb-6">
-                   <img src="/mempelai-pria.jpg" alt="Rijal" className="w-full h-full object-cover" />
+                <h3 className="text-4xl md:text-5xl gold-text font-serif mb-4">Novi Salsabilah</h3>
+                <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-2">Putri Kedua Dari:</p>
+                <p className="text-white font-serif text-lg leading-relaxed">Bapak Abdul Mutolib <br/> & Ibu Sri Rahayu</p>
+              </motion.div>
+
+              <motion.div initial={{ x: 50, opacity: 0 } as any} whileInView={{ x: 0, opacity: 1 } as any} className="text-center group">
+                <div className="w-64 h-64 mx-auto rounded-full border-4 border-[#BF953F] overflow-hidden mb-8 shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                   <img src="/mempelai2.jpg" className="w-full h-full object-cover" alt="Rijal" />
                 </div>
-                <h3 className="text-3xl font-serif gold-text">Rijal Fauji</h3>
-                <p className="text-sm text-gray-400 mt-2">Putra dari Bapak Fulan & Ibu Fulanah</p>
+                <h3 className="text-4xl md:text-5xl gold-text font-serif mb-4">Rijal Fauji</h3>
+                <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-2">Putra Kedua Dari:</p>
+                <p className="text-white font-serif text-lg leading-relaxed">Bapak Ajidin <br/> & Ibu Sri Rahayu</p>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* SECTION 4: GALLERY FOTO (GRID 8 FOTO) */}
+          <section className="py-24 px-6 bg-white/5">
+             <h3 className="text-center text-3xl gold-text font-serif mb-20 uppercase tracking-[0.4em]">Momen Bahagia</h3>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto1.jpg" className="w-full h-full object-cover" alt="G1"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto2.jpg" className="w-full h-full object-cover" alt="G2"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto3.jpg" className="w-full h-full object-cover" alt="G3"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto4.jpg" className="w-full h-full object-cover" alt="G4"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto5.jpg" className="w-full h-full object-cover" alt="G5"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto6.jpg" className="w-full h-full object-cover" alt="G6"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto7.jpg" className="w-full h-full object-cover" alt="G7"/></div>
+                <div className="aspect-[3/4] rounded-3xl overflow-hidden border border-white/10"><img src="/foto8.jpg" className="w-full h-full object-cover" alt="G8"/></div>
              </div>
           </section>
 
-          {/* GRID FOTO / GALLERY */}
-          <section className="py-20 bg-black/40">
-            <div className="container mx-auto px-4">
-              <h3 className="text-center font-serif text-4xl gold-text mb-12">Momen Bahagia</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1,2,3,4,5,6,7,8].map((i) => (
-                  <motion.div key={i} whileHover={{ scale: 1.05 } as any} className="aspect-[3/4] overflow-hidden rounded-xl border border-white/10">
-                    <img src={`/gallery-${i}.jpg`} className="w-full h-full object-cover" alt="Gallery" />
-                  </motion.div>
-                ))}
+          {/* SECTION 5: LOKASI & WAKTU */}
+          <section className="max-w-5xl mx-auto px-6 py-24">
+            <div className="bg-black/40 backdrop-blur-xl p-10 md:p-20 rounded-[50px] border border-white/10 relative text-center">
+              <CornerOrnaments />
+              <Calendar className="mx-auto text-[#BF953F] mb-10" size={40} />
+              <h3 className="text-4xl gold-text font-serif mb-16 uppercase tracking-[0.3em]">Waktu & Lokasi</h3>
+              <div className="grid md:grid-cols-2 gap-12 mb-16">
+                <div className="p-8 bg-white/5 rounded-3xl border border-white/10">
+                  <h5 className="gold-text font-bold text-xs uppercase mb-4 tracking-widest">Akad Nikah</h5>
+                  <p className="text-2xl font-serif text-white mb-2">Sabtu, 10 Januari 2026</p>
+                  <p className="text-sm text-gray-400">08:00 - 10:00 WIB</p>
+                </div>
+                <div className="p-8 bg-white/5 rounded-3xl border border-white/10">
+                  <h5 className="gold-text font-bold text-xs uppercase mb-4 tracking-widest">Resepsi</h5>
+                  <p className="text-2xl font-serif text-white mb-2">Sabtu, 10 Januari 2026</p>
+                  <p className="text-sm text-gray-400">11:00 WIB - Selesai</p>
+                </div>
               </div>
+              <div className="h-96 rounded-[40px] overflow-hidden border-2 border-[#BF953F]/30 mb-10">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3966.316612642867!2d106.52211109999999!3d-6.2219166999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNsKwMTMnMTguOSJTIDEwNsKwMzEnMTkuNiJF!5e0!3m2!1sid!2sid!4v1767886903248!5m2!1sid!2sid" width="100%" height="100%" style={{ border: 0, filter: 'grayscale(1) invert(0.9)' }}></iframe>
+              </div>
+              <a href="https://maps.app.goo.gl/5SY55VUgtx71pgdb8" target="_blank" className="inline-flex items-center gap-3 bg-[#BF953F] text-black px-12 py-5 rounded-full font-bold uppercase text-xs tracking-widest shadow-2xl">
+                 <Navigation size={18} /> Petunjuk Lokasi
+              </a>
             </div>
           </section>
 
-          {/* ACARA & LOKASI */}
-          <section className="py-20 px-6 text-center">
-            <div className="bg-[#1a1a1a] p-10 rounded-[40px] border border-[#BF953F]/20 max-w-3xl mx-auto">
-               <Calendar className="mx-auto text-[#BF953F] mb-4" />
-               <h3 className="text-3xl font-serif gold-text mb-8">Akad & Resepsi</h3>
-               <p className="text-xl mb-2">Sabtu, 10 Januari 2026</p>
-               <p className="text-gray-400 mb-8">08:00 WIB - Selesai</p>
-               <div className="h-64 rounded-2xl overflow-hidden mb-8 border border-white/10">
-                 <iframe src="https://www.google.com/maps/embed?..." width="100%" height="100%" style={{ border: 0 }}></iframe>
-               </div>
-               <a href="#" className="inline-flex items-center gap-2 bg-[#BF953F] text-black px-10 py-3 rounded-full font-bold">
-                 <Navigation size={18} /> Buka Google Maps
-               </a>
-            </div>
+          {/* SECTION 6: WEDDING GIFT (REKENING DETAIL) */}
+          <section className="max-w-4xl mx-auto px-6 py-24 text-center">
+             <Gift className="mx-auto text-[#BF953F] mb-6" size={40} />
+             <h3 className="text-3xl gold-text font-serif mb-6 uppercase tracking-widest">Informasi Hadiah</h3>
+             <p className="text-gray-400 mb-16 text-sm italic">Doa restu Anda adalah hadiah terindah, namun jika ingin memberi tanda kasih, silakan melalui:</p>
+             <div className="grid md:grid-cols-2 gap-8">
+                <div className="p-12 bg-white/5 rounded-[50px] border border-white/10 relative">
+                   <CornerOrnaments />
+                   <p className="text-xs text-gray-500 uppercase font-bold mb-4 tracking-widest">Bank SEABANK</p>
+                   <p className="text-2xl font-bold text-white mb-2">901237587629</p>
+                   <p className="gold-text font-serif text-lg mb-8 italic">a.n Novi Salsabilah</p>
+                   <button onClick={() => copyToClipboard("901237587629", "S1")} className="px-10 py-3 border border-[#BF953F] rounded-full text-[10px] text-[#BF953F] uppercase font-bold tracking-widest">
+                     {copied === "S1" ? "Berhasil Disalin" : "Salin Rekening"}
+                   </button>
+                </div>
+                <div className="p-12 bg-white/5 rounded-[50px] border border-white/10 relative">
+                   <CornerOrnaments />
+                   <p className="text-xs text-gray-500 uppercase font-bold mb-4 tracking-widest">Bank BCA</p>
+                   <p className="text-2xl font-bold text-white mb-2">8880815017</p>
+                   <p className="gold-text font-serif text-lg mb-8 italic">a.n Rijal Fauji</p>
+                   <button onClick={() => copyToClipboard("8880815017", "B1")} className="px-10 py-3 border border-[#BF953F] rounded-full text-[10px] text-[#BF953F] uppercase font-bold tracking-widest">
+                     {copied === "B1" ? "Berhasil Disalin" : "Salin Rekening"}
+                   </button>
+                </div>
+             </div>
           </section>
 
-          {/* NOMOR REKENING (WEDDING GIFT) */}
-          <section className="py-20 px-6 text-center bg-[#0f0f0f]">
-            <Gift className="mx-auto text-[#BF953F] mb-4" />
-            <h3 className="text-3xl font-serif gold-text mb-4">Wedding Gift</h3>
-            <p className="text-gray-400 max-w-md mx-auto mb-10 text-sm">Doa restu Anda merupakan kado terindah bagi kami. Namun jika ingin memberi tanda kasih, silakan melalui:</p>
-            
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {/* Rekening 1 */}
-              <div className="bg-white/5 p-8 rounded-3xl border border-white/10 relative">
-                <img src="/bank-seabank.png" className="h-8 mx-auto mb-4 opacity-80" alt="SeaBank" />
-                <p className="text-sm text-gray-400">SEABANK</p>
-                <p className="text-xl font-bold my-2 tracking-wider">901234567890</p>
-                <p className="text-xs uppercase gold-text">A.n Novi Salsabilah</p>
-                <button onClick={() => copyToClipboard('901234567890', 'seabank')} className="mt-4 flex items-center gap-2 mx-auto text-xs bg-white/10 px-4 py-2 rounded-lg">
-                  {copied === 'seabank' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />} 
-                  {copied === 'seabank' ? 'Berhasil Salin' : 'Salin Rekening'}
-                </button>
-              </div>
-
-              {/* Rekening 2 */}
-              <div className="bg-white/5 p-8 rounded-3xl border border-white/10">
-                <img src="/bank-bca.png" className="h-8 mx-auto mb-4 opacity-80" alt="BCA" />
-                <p className="text-sm text-gray-400">BCA</p>
-                <p className="text-xl font-bold my-2 tracking-wider">1234567890</p>
-                <p className="text-xs uppercase gold-text">A.n Rijal Fauji</p>
-                <button onClick={() => copyToClipboard('1234567890', 'bca')} className="mt-4 flex items-center gap-2 mx-auto text-xs bg-white/10 px-4 py-2 rounded-lg">
-                  {copied === 'bca' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />} 
-                  {copied === 'bca' ? 'Berhasil Salin' : 'Salin Rekening'}
-                </button>
-              </div>
-            </div>
+          {/* SECTION 7: RSVP (KONFIRMASI KEHADIRAN) */}
+          <section className="max-w-4xl mx-auto px-6 py-24">
+             <div className="bg-white/5 p-12 rounded-[50px] border border-white/10 backdrop-blur-xl">
+                <h3 className="text-2xl gold-text font-serif mb-12 uppercase text-center tracking-widest">Konfirmasi Kehadiran</h3>
+                <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+                   <div className="space-y-2">
+                      <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-4">Nama Lengkap</label>
+                      <input type="text" className="w-full bg-black/50 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-[#BF953F] transition-all" placeholder="Nama Anda" />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-4">Kehadiran</label>
+                      <select className="w-full bg-black/50 border border-white/10 rounded-2xl px-6 py-4 outline-none appearance-none">
+                         <option>Hadir</option>
+                         <option>Tidak Dapat Hadir</option>
+                      </select>
+                   </div>
+                   <button onClick={() => window.open('https://wa.me/628?text=KonfirmasiKehadiran')} className="w-full bg-[#BF953F] text-black py-5 rounded-2xl font-black uppercase text-xs tracking-[0.3em] flex items-center justify-center gap-3">
+                      <MessageCircle size={18} /> Kirim Via WhatsApp
+                   </button>
+                </form>
+             </div>
           </section>
 
-          {/* FOOTER */}
-          <footer className="py-20 text-center border-t border-white/5">
-             <h4 className="font-serif text-4xl gold-text mb-4">Terima Kasih</h4>
-             <p className="text-gray-500 text-xs tracking-widest uppercase">Digital Invitation by @grentravlt_</p>
-          </footer>
-        </div>
+          {/* SECTION 8: PENUTUP & DOA PENGANTIN */}
+          <section className="py-40 text-center px-6">
+             <h3 className="text-3xl gold-text font-serif mb-12 uppercase tracking-widest">Doa Pengantin</h3>
+             <p className="text-xl md:text-3xl italic text-gray-200 mb-16 font-serif leading-relaxed max-w-4xl mx-auto">
+                بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ<br />
+                <span className="text-lg block mt-8 gold-text">Barakallahu laka wa baraka ‘alaika wa jama’a bainakuma fii khoir</span>
+             </p>
+             <div className="mt-32">
+                <p className="text-[10px] text-[#BF953F] tracking-[0.8em] uppercase mb-10 font-black">Kami Yang Berbahagia</p>
+                <h4 className="text-5xl md:text-8xl gold-text font-serif mb-16">Novi & Rijal</h4>
+                <div className="inline-block px-12 py-4 border-y border-[#BF953F]/30 italic text-gray-500 text-[10px] tracking-[0.5em]">
+                   DIGITAL INVITATION BY @GRENTRAVLT_
+                </div>
+             </div>
+          </section>
+
+        </motion.div>
       )}
 
       <style jsx global>{`
@@ -211,7 +297,7 @@ function InvitationContent() {
 
 export default function WeddingPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-black" />}>
+    <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center gold-text text-xl">Memuat Undangan Mewah...</div>}>
       <InvitationContent />
     </Suspense>
   );
