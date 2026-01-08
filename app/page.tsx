@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { MailOpen, MapPin, Heart, Volume2, VolumeX, Navigation, Calendar, MessageCircle } from 'lucide-react';
 
-// Solusi Bypass Type Error untuk Vercel/Netlify
+// Bypass Type Error untuk elemen motion agar lolos build Vercel/Netlify
 const MotionSection: any = motion.section;
 const MotionDiv: any = motion.div;
 
@@ -64,23 +64,26 @@ function InvitationContent() {
     <main className="min-h-screen relative overflow-x-hidden font-sans bg-transparent">
       <audio ref={audioRef} loop src="/wedding.mp3" />
 
+      {/* GAMBAR BACKGROUND UTAMA */}
       <div className="fixed inset-0 -z-20">
         <MotionDiv style={{ y: bgY, scale: bgScale } as any} className="w-full h-full">
             <img src="/bg-wedding.jpg" className="w-full h-full object-cover" alt="Background Utama" />
         </MotionDiv>
       </div>
 
+      {/* Progress Bar */}
       {isOpen && (
         <motion.div
           className="fixed top-0 left-0 right-0 h-1 bg-[#BF953F] origin-left z-[200]"
-          style={{ scaleX: scrollYProgress }}
+          style={{ scaleX: scrollYProgress } as any} 
         />
       )}
 
+      {/* LANDING PAGE / COVER */}
       <AnimatePresence>
         {!isOpen && (
           <MotionSection
-            key="landing-cover"
+            key="cover"
             exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
             transition={{ duration: 1 }}
             className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
@@ -113,27 +116,28 @@ function InvitationContent() {
         )}
       </AnimatePresence>
 
+      {/* ISI UNDANGAN (UTUH) */}
       {isOpen && (
         <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5 }}>
           
+          {/* AUDIO CONTROL */}
           <button onClick={() => { if(audioRef.current) isPlaying ? audioRef.current.pause() : audioRef.current.play(); setIsPlaying(!isPlaying); }} 
             className="fixed bottom-6 right-6 z-50 p-4 bg-black/60 border border-[#BF953F] rounded-full text-[#BF953F] backdrop-blur-md shadow-2xl hover:bg-[#BF953F] hover:text-black transition-all">
             {isPlaying ? <Volume2 size={20} className="animate-pulse" /> : <VolumeX size={20} />}
           </button>
 
+          {/* 1. HERO SECTION */}
           <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
             <div className="container mx-auto max-w-6xl relative">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8 items-center">
                 <MotionDiv initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 1 }} className="hidden md:block aspect-[3/4] rounded-full overflow-hidden border-2 border-[#BF953F]/30 shadow-2xl rotate-[-5deg] hover:rotate-0 transition-transform duration-700">
                   <img src="/mempelai.jpg" className="w-full h-full object-cover scale-110" alt="Novi" />
                 </MotionDiv>
-
                 <div className="col-span-2 md:col-span-1 text-center z-10">
                   <MotionDiv initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2 }}>
                     <span className="text-[#BF953F] tracking-[0.6em] uppercase text-[10px] font-black">The Wedding of</span>
                     <h1 className="text-6xl md:text-7xl gold-text font-serif mt-6 mb-4 leading-tight">Novi Salsabilah & Rijal Fauji</h1>
                     <p className="text-white tracking-[0.4em] font-light mb-12 italic border-y border-white/10 py-2 inline-block">10 . 01 . 2026</p>
-                    
                     <div className="grid grid-cols-4 gap-3 max-w-xs mx-auto">
                        {[{ l: 'Hari', v: timeLeft.hari }, { l: 'Jam', v: timeLeft.jam }, { l: 'Menit', v: timeLeft.menit }, { l: 'Detik', v: timeLeft.detik }].map((t, i) => (
                          <div key={i} className="bg-white/5 backdrop-blur-md border border-[#BF953F]/20 p-3 rounded-2xl shadow-xl">
@@ -144,7 +148,6 @@ function InvitationContent() {
                     </div>
                   </MotionDiv>
                 </div>
-
                 <MotionDiv initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 1 }} className="hidden md:block aspect-[3/4] rounded-full overflow-hidden border-2 border-[#BF953F]/30 shadow-2xl rotate-[5deg] hover:rotate-0 transition-transform duration-700">
                   <img src="/mempelai2.jpg" className="w-full h-full object-cover scale-110" alt="Rijal" />
                 </MotionDiv>
@@ -152,6 +155,7 @@ function InvitationContent() {
             </div>
           </section>
 
+          {/* 2. AR-RUM */}
           <section className="max-w-4xl mx-auto px-6 py-32 text-center relative">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-9xl text-white/5 font-serif -z-10 select-none">Love</div>
              <Heart className="mx-auto text-[#BF953F] mb-10 animate-pulse" size={40} />
@@ -161,6 +165,7 @@ function InvitationContent() {
              <p className="text-[10px] text-gray-500 uppercase tracking-[0.5em] font-bold">— QS. Ar-Rum: 21</p>
           </section>
 
+          {/* 3. SALAM & PROFIL */}
           <section className="max-w-6xl mx-auto px-6 py-24 text-center">
             <h3 className="text-2xl gold-text mb-12 font-serif tracking-[0.2em]">Assalamu’alaikum Wr. Wb.</h3>
             <p className="text-sm text-gray-400 mb-20 italic max-w-2xl mx-auto font-light leading-loose">
@@ -174,9 +179,7 @@ function InvitationContent() {
                 <h4 className="text-4xl md:text-5xl font-serif gold-text mb-4">Novi Salsabilah</h4>
                 <p className="text-[10px] text-gray-400 uppercase font-bold tracking-[0.2em] max-w-[250px] mx-auto leading-relaxed">Putri Kedua dari <br/>Bpk. Abdul Mutolib & Ibu Sri Rahayu</p>
               </MotionDiv>
-
               <div className="text-5xl font-serif text-[#BF953F] animate-bounce">&</div>
-
               <MotionDiv initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="group">
                 <div className="w-48 h-48 md:w-64 md:h-64 mx-auto mb-8 rounded-full overflow-hidden border-4 border-[#BF953F]/30 shadow-2xl group-hover:scale-105 transition-transform">
                   <img src="/mempelai2.jpg" className="w-full h-full object-cover" alt="Rijal" />
@@ -187,17 +190,19 @@ function InvitationContent() {
             </div>
           </section>
 
-          <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-            <h3 className="text-3xl gold-text mb-16 font-serif text-center uppercase tracking-[0.3em]">Our Moments</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <MotionDiv key={i} whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? 2 : -2 }} className="aspect-[3/4] rounded-[30px] overflow-hidden border-2 border-[#BF953F]/20 shadow-2xl cursor-pointer">
-                  <img src={`/foto${i}.jpg`} className="w-full h-full object-cover" alt={`Gallery ${i}`} />
-                </MotionDiv>
-              ))}
-            </div>
+          {/* 4. PHOTO GALLERY */}
+          <section className="max-w-6xl mx-auto px-6 py-24">
+             <h3 className="text-3xl gold-text mb-16 font-serif text-center uppercase tracking-[0.3em]">Our Moments</h3>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <MotionDiv key={i} whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? 2 : -2 }} className="aspect-[3/4] rounded-[30px] overflow-hidden border-2 border-[#BF953F]/20 shadow-2xl cursor-pointer">
+                    <img src={`/foto${i}.jpg`} className="w-full h-full object-cover" alt={`Gallery ${i}`} />
+                  </MotionDiv>
+                ))}
+             </div>
           </section>
 
+          {/* 5. LOKASI */}
           <section className="max-w-5xl mx-auto px-6 py-24">
             <div className="ornate-card p-8 md:p-20 text-center relative overflow-hidden">
               <CornerOrnaments />
@@ -216,7 +221,7 @@ function InvitationContent() {
                 </div>
               </div>
               <div className="rounded-[40px] overflow-hidden h-96 mb-12 border-2 border-[#BF953F]/30 shadow-inner group">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.81956135000001!3d-6.194741399999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5390917b759%3A0x6b45e673f7464527!2sGrand%20Indonesia!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" 
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.3!2d107.6!3d-6.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwNTQnMDAuMCJTIDEwN8KwMzYnMDAuMCJF!5e0!3m2!1sid!2sid!4v1" 
                 width="100%" height="100%" style={{ border: 0, filter: 'grayscale(1) invert(0.9) contrast(1.2)' }} allowFullScreen loading="lazy"></iframe>
               </div>
               <a href="https://maps.google.com" target="_blank" className="inline-flex items-center gap-3 bg-gradient-to-r from-[#BF953F] to-[#AA771C] text-black px-12 py-5 rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:scale-105 transition-transform active:scale-95">
@@ -225,6 +230,7 @@ function InvitationContent() {
             </div>
           </section>
 
+          {/* 6. TANDA KASIH */}
           <section className="max-w-4xl mx-auto px-6 py-24">
              <h3 className="text-4xl gold-text mb-16 font-serif text-center uppercase tracking-[0.3em]">Informasi Transfer</h3>
              <div className="grid md:grid-cols-2 gap-8">
@@ -243,6 +249,7 @@ function InvitationContent() {
              </div>
           </section>
 
+          {/* 7. RSVP & BUKU TAMU */}
           <section className="max-w-6xl mx-auto px-6 py-24">
              <div className="grid lg:grid-cols-2 gap-12">
                 <div className="bg-white/5 p-12 rounded-[50px] border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden">
@@ -278,7 +285,8 @@ function InvitationContent() {
              </div>
           </section>
 
-          <section className="py-40 px-6 text-center relative overflow-hidden">
+          {/* 8. DOA PENGANTIN & PENUTUP */}
+          <section className="py-40 px-6 text-center relative overflow-hidden bg-gradient-to-t from-black via-transparent to-transparent">
              <div className="relative z-10">
                <h3 className="text-3xl gold-text mb-12 font-serif uppercase tracking-[0.4em]">Doa Pengantin</h3>
                <p className="text-2xl md:text-3xl italic text-gray-200 mb-10 font-serif leading-relaxed max-w-4xl mx-auto">
