@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  /* Menghubungkan variabel font dari layout.tsx ke Tailwind */
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+  
+  /* Animasi custom untuk efek emas berkilau */
+  @keyframes gold-shine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
+:root {
+  --gold-linear: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  /* Background hitam transparan agar foto utama di page.tsx bisa terlihat */
+  background-color: rgba(0, 0, 0, 0.7) !important; 
+  color: #fff;
+  overflow-x: hidden;
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Tekstur debu bintang halus di seluruh layar */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Class khusus untuk teks berwarna emas metalik berkilau */
+.gold-text {
+  background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  background-size: 200% auto;
+  animation: gold-shine 4s linear infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+  font-weight: bold;
+}
+
+/* Card transparan mewah untuk bagian konten */
+.ornate-card {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(191, 149, 63, 0.3); /* Border warna emas tipis */
+  border-radius: 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Scrollbar minimalis warna emas */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #BF953F;
+  border-radius: 10px;
+}
