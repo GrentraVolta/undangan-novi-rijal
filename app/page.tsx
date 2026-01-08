@@ -2,8 +2,9 @@
 import { useState, Suspense, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { MailOpen, MapPin, Heart, Volume2, VolumeX, Navigation, Copy, CheckCircle2, Calendar, MessageCircle } from 'lucide-react';
-
+// Tambahkan baris ini di bawah import untuk "menipu" TypeScript agar tidak protes
+const MotionSection: any = motion.section; 
+const MotionDiv: any = motion.div; // Sekalian untuk div jika diperlukan
 function InvitationContent() {
   const searchParams = useSearchParams();
   const guestName = searchParams.get('to') || 'Tamu Undangan';
@@ -81,11 +82,11 @@ return (
     {/* LANDING PAGE / COVER */}
     <AnimatePresence>
       {!isOpen && (
-        <motion.section
-          exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
-          transition={{ duration: 1 }}
-          className="fixed inset-0 z-100 flex items-center justify-center overflow-hidden"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.65)' }} // Mengikuti opacity 65%
+        <MotionSection
+  exit={{ opacity: 0, scale: 0.95, filter: 'blur(5px)' }}
+  transition={{ duration: 1 }}
+  className="fixed inset-0 z-100 flex items-center justify-center overflow-hidden"
+  style={{ backgroundColor: 'rgba(0, 0, 0, 0.65)' }} // Mengikuti opacity 65%
         
           >
             <div className="absolute inset-0">
